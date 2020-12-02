@@ -35,3 +35,6 @@
     - browser.execute_script(script, *args)
         - args는 arguments[0] ... 으로 들어간다.
     - selenium에서 찾은 element를 script함수를 통해 보내면, html element가 된다.
+    - execute_script 값을 리턴 값으로 얻고 싶으면 script안에 return을 넣어주면 된다.
+
+## 7. Action Chain

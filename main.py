@@ -14,10 +14,11 @@ KEYWORD = "buy domain"
 
 
 class GoogleKeywordScreenShooter():
-    def __init__(self, keyword, dir="screenshots"):
+    def __init__(self, keyword, max_page=10, dir="screenshots"):
         self.browser = webdriver.Chrome(ChromeDriverManager().install())
         self.keyword = keyword
         self.dir = dir
+        self.max_page = max_page
 
     def start(self):
         self.browser.get('https://google.com')
@@ -25,17 +26,39 @@ class GoogleKeywordScreenShooter():
             search_bar = self.browser.find_element_by_class_name('gLFyf')
             search_bar.send_keys(self.keyword, Keys.RETURN)
 
-            shitty_element = WebDriverWait(self.browser, 5).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "g-blk")))
-            self.browser.execute_script("""
-                const shitty = arguments[0];
-                shitty.parentElement.removeChild(shitty);
-            """, shitty_element)
-            search_results = self.browser.find_elements_by_class_name('g')
+            
 
-            print(f"Count of Results: {len(search_results)}")
-            for i,result in enumerate(search_results):
-                if 'kno-kp' not in result.get_attribute('class'):
-                    result.screenshot(f"{self.dir}/{self.keyword}-{i}.png")
+            for page in range(1, self.max_page+1):
+                try:
+                    shitty_element = WebDriverWait(self.browser, 5).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "g-blk")))
+                    if shitty_element is not None:
+                        self.browser.execute_script("""
+                            const shitty = arguments[0];
+                            shitty.parentElement.removeChild(shitty);
+                        """, shitty_element)
+                except exceptions.TimeoutException:
+                    pass
+                
+                search_results = self.browser.find_elements_by_class_name('g')
+
+                print(f"Count of Results: {len(search_results)}")
+                for i,result in enumerate(search_results):
+                    if 'kno-kp' not in result.get_attribute('class'):
+                        result.screenshot(f"{self.dir}/{self.keyword}-{page}-{i}.png")
+
+                next_page_elems = self.browser.find_elements_by_class_name('fl')
+                next_page = None
+                for p in next_page_elems:
+                    if p.text != '' and int(p.text) == page+1:
+                        next_page = p
+                        break
+                
+                if next_page is not None:
+                    next_page.click()
+                else:
+                    break
+
+
         finally:
             self.browser.quit() 
 
