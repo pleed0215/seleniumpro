@@ -30,16 +30,16 @@ class ResponsiveTest():
 
             input = self.browser.find_element_by_class_name("XTCLo")
             input.send_keys(self.tag)
-            
-            related_box = WebDriverWait(self.browser, 5).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "drKGC")))
-            
 
+            
+            
+            related_box = WebDriverWait(self.browser, 5).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "fuqBx")))
+            time.sleep(2)
             if related_box is not None:
-                tags = related_box.find_elements_by_xpath("//div/a[@class='yCE8d']")
+                tags = related_box.find_elements_by_xpath(".//a")
                 print(tags)
                 for tag in tags:
-                    if tag.tag_name == "a":
-                        ActionChains(self.browser).key_down(Keys.COMMAND).click(tag).perform()
+                    tag.click()
         finally:
            self.browser.quit()
 
