@@ -67,7 +67,7 @@ class GetUberEats():
 
             print("You may input verify code.. please look up your sms code.")
 
-            ul_tag = self.wait_for((By.XPATH, '//*[@id="main-content"]/div/div[1]/div[2]/nav/ul'), 500)
+            ul_tag = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="main-content"]/div/div[1]/div[2]/nav/ul')))
             items = ul_tag.find_elements_by_tag_name("li")
 
             
