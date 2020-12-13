@@ -1,5 +1,5 @@
 {
-  "python.pythonPath": "/Users/pleed0215/.local/share/virtualenvs/seleniumpro-EI0shk7d/bin/python",
+  "python.pythonPath": "C:\\Users\\pleed0215\\.virtualenvs\\seleniumpro-2Gx-veKr\\Scripts\\python.exe",
   "python.languageServer": "Pylance",
   "python.formatting.provider": "black",
   "python.formatting.blackPath": "/Users/pleed0215/.local/share/virtualenvs/seleniumpro-EI0shk7d/lib/python3.8/site-packages/black"

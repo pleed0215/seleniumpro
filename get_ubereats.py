@@ -28,8 +28,8 @@ BASE_URL="https://www.ubereats.com/"
 class GetUberEats():
     def __init__(self, id=None, password=None):
         self.browser = webdriver.Chrome(ChromeDriverManager().install())
-        self.id = "pleed0215@gmail.com"
-        self.password = "Plmandoo1!"
+        self.id = ""
+        self.password = ""
 
     def wait_for(self, locator, second=10):
         return WebDriverWait(self.browser, second).until(
@@ -39,7 +39,9 @@ class GetUberEats():
     def start(self):
         try:
             #self.browser.get(self.url)
+            self.browser.maximize_window()
             self.browser.get(BASE_URL)
+            
 
             print("Clicking Sign in button")
             sign_in = self.browser.find_element_by_link_text("Sign in")
@@ -67,28 +69,57 @@ class GetUberEats():
 
             print("You may input verify code.. please look up your sms code.")
 
-            ul_tag = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="main-content"]/div/div[1]/div[2]/nav/ul')))
-            items = ul_tag.find_elements_by_tag_name("li")
-
+            ul_tag = WebDriverWait(self.browser, 500).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="main-content"]/div/div[1]/div[2]/nav/ul')))
+            time.sleep(5)
+            print("Wait for 5 seconds... ")
+            items = ul_tag.find_elements_by_tag_name("li")            
             
 
             for item in items:
                 if item.text != "Deals":
-                    ActionChains(self.browser).key_down(Keys.COMMAND).click(item).perform()
-                    
-            time.sleep(5)
-            print("Wait for 5 seconds... ")
+                    #ActionChains(self.browser).key_down(Keys.COMMAND).click(item).perform()
+                    ActionChains(self.browser).key_down(Keys.LEFT_SHIFT).click(item).key_up(Keys.LEFT_SHIFT).perform()  
+                                        
+                    data = {"category": item.text, "restaurants": []}
+                    ###self.browser.switch_to.window(window)
+                    main_box = self.wait_for((By.XPATH, '//*[@id="main-content"]/div/div/div[2]/div/div[2]'))
+                    boxes = main_box.find_elements_by_xpath('//*[@id="main-content"]/div/div/div[2]/div/div[2]/div')
+                    for box in boxes:
+                        name = box.find_element_by_tag_name('p')
+                        image = box.find_element_by_xpath('//div/figure/div[1]/picture/source')
 
-            for window in self.browser.window_handles:
-                self.browser.switch_to.window(window)
-                main_box = self.wait_for((By.XPATH, '//*[@id="main-content"]/div/div/div[2]/div/div[2]'))
-                names = main_box.find_elements_by_xpath('//*[@id="main-content"]/div/div/div[2]/div/div[2]/div/div/a/div/div[1]/p')
-                print(len(names))
-                for name in names:
-                    print(name.text)
+                        ActionChains(self.browser).click(box).perform()
+
+                        address = self.wait_for((By.XPATH, '//*[@id="main-content"]/div[3]/div[1]/p'), 100) 
+                        addressText= self.browser.execute_script("return arguments[0].firstChild.textContent", address)
+                        self.wait_for((By.XPATH, '//*[@id="main-content"]/div/div[3]/ul/li[1]/ul/li[1]/div'), 100)
+
+                        print(addressText)
+                        dishes = self.browser.find_elements_by_xpath('//*[@id="main-content"]/div[3]/ul/li/ul/li')                        
+                        data.get("restaurants").append({"name":name.text, "image":image.get_attribute("srcset"), "address":addressText, "dishes":[]})
+                        i = len(data.get('restaurants'))
+                        print(i)
+                        for dish in dishes:
+                            try:
+                                dish_name = dish.find_element_by_class_name('jq jr js aj')
+                                dish_price = dish.find_element_by_class_name('cv cp cq bc')
+                                dish_description = dish.find_element_by_class_name('ca f1 cq cs')
+                                dish_image = dish.find_element_by_xpath('//div/div/div/div[2]/picture/source')
+                                data.get('restaurants')[i-1]['dishes'].append({'name': dish_name.text, 'price': dish_price.text[1:], 'description':dish_description.text, 'image': dish_image.get_attribute('srcset')})
+
+                            except exceptions.NoSuchElementException:
+                                continue                        
+                        self.browser.back()
+                        
+                    print(data)
+                    ActionChains(self.browser).key_down(Keys.LEFT_CONTROL).send_keys('w').key_up(Keys.LEFT_CONTROL).perform()
+                
+
 
         finally:
-            print("end")    
+            print('end')
+           #self.browser.quit()
+            
 
         """    nav_box = self.browser.find_element_by_tag_name('nav')
 
@@ -103,7 +134,6 @@ class GetUberEats():
             #related_box = WebDriverWait(self.browser, 5).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, "fuqBx")))
         """
         
-           #self.browser.quit()
 
 
 tester = GetUberEats()
